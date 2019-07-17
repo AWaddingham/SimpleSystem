@@ -28,16 +28,9 @@ void OnTick()
     {
       IsFirstTick = false;
       
-      if (Open[0] < Open[StartHour])
-      {
-        ticket = OrderSend(Symbol(), OP_BUY, Lots, Ask, 10, Bid - (StopLoss * Point), Bid + (TakeProfit * Point), "Set by SimpleSystem");
-        CheckOrderSendResult(ticket);
-      }
-      else
-      {
-        ticket = OrderSend(Symbol(), OP_SELL, Lots, Bid, 10, Ask + (StopLoss * Point), Ask - (TakeProfit * Point), "Set by SimpleSystem");
-        CheckOrderSendResult(ticket);
-      }    
+      CloseOpenOrders(ticket);
+            
+      ticket = CreateOrder();    
     }
   }
   else 
@@ -56,15 +49,57 @@ bool CheckCurrentHourIsStartHour()
   return Hour() == StartHour;
 }
 
+void CloseOpenOrders(int ticket)
+{
+  if(OrderSelect(ticket, SELECT_BY_TICKET))
+  {
+    if(OrderCloseTime() == 0)
+    {
+      bool orderCloseResult = OrderClose(ticket, Lots, OrderClosePrice(), 10);
+      CheckOrderCloseResult(orderCloseResult);
+    }
+  }
+}
+
+int CreateOrder()
+{
+  int ticket = 0;
+  
+  if (Open[0] < Open[StartHour])
+  {
+    ticket = OrderSend(Symbol(), OP_BUY, Lots, Ask, 10, Bid - (StopLoss * Point), Bid + (TakeProfit * Point), "Set by SimpleSystem");
+    CheckOrderSendResult(ticket);
+  }
+  else
+  {
+    ticket = OrderSend(Symbol(), OP_SELL, Lots, Bid, 10, Ask + (StopLoss * Point), Ask - (TakeProfit * Point), "Set by SimpleSystem");
+    CheckOrderSendResult(ticket);
+  }
+  
+  return ticket;
+}
+
 void CheckOrderSendResult(int result)
 {
-    switch(result)
-    {
-      case -1:
-        Alert("Order failed.");
-      break;
-      default:
-        Alert("Order Ticket Number: ", result);
-    }
+  switch(result)
+  {
+    case -1:
+      Alert("Order failed.");
+    break;
+    default:
+      Alert("Order Ticket Number: ", result);
+  }
+}
+
+void CheckOrderCloseResult(bool result)
+{
+  if(result)
+  {
+    Alert("Order closed successfully.");
+  }
+  else
+  {
+    Alert("Failed to close order.");
+  }    
 }
 //+------------------------------------------------------------------+
