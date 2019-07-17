@@ -67,12 +67,12 @@ int CreateOrder()
   
   if (Open[0] < Open[StartHour])
   {
-    ticket = OrderSend(Symbol(), OP_BUY, Lots, Ask, 10, Bid - (StopLoss * Point), Bid + (TakeProfit * Point), "Set by SimpleSystem");
+    ticket = OrderSend(Symbol(), OP_BUY, Lots, Ask, 10, (Bid - (StopLoss * Point) * 10), (Bid + (TakeProfit * Point) * 10), "Set by SimpleSystem");
     CheckOrderSendResult(ticket);
   }
   else
   {
-    ticket = OrderSend(Symbol(), OP_SELL, Lots, Bid, 10, Ask + (StopLoss * Point), Ask - (TakeProfit * Point), "Set by SimpleSystem");
+    ticket = OrderSend(Symbol(), OP_SELL, Lots, Bid, 10, (Ask + (StopLoss * Point) * 10), (Ask - (TakeProfit * Point) * 10), "Set by SimpleSystem");
     CheckOrderSendResult(ticket);
   }
   
